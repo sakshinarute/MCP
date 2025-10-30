@@ -5,5 +5,6 @@ public class Main {
         System.out.println("Hello world!");
         System.out.println("Hello from MCP branch");
         System.out.println("Checking PR into main by github copilot");
+        System.out.println("Hello from MCP integrated workflow!");
     }
 }
