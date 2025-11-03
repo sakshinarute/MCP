@@ -7,6 +7,7 @@ public class Main {
         System.out.println("Checking PR into main by github copilot");
         System.out.println("Hello from MCP integrated workflow!");
         System.out.println("Hello from MCP integrated workflow checking 2 time!");
+        System.out.println("Checking whole CI/CD workflow...");
 
     }
 }
