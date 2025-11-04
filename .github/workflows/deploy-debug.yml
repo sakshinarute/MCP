@@ -1,0 +1,58 @@
+name: Deploy debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "dev"
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  deploy-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install gh CLI
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update && sudo apt-get install -y gh
+
+      - name: Authenticate gh (uses GITHUB_TOKEN)
+        run: gh auth status || true
+
+      - name: Find latest successful run on main
+        id: find_run
+        run: |
+          echo "Finding latest successful workflow run on main..."
+          gh run list --branch main --repo ${{ github.repository }} --limit 10 --json databaseId,conclusion,event,headBranch | jq -r '.[] | select(.conclusion=="success") | .databaseId' | head -n1 > runid.txt || true
+          if [ -s runid.txt ]; then
+            echo "run_id=$(cat runid.txt)" >> $GITHUB_OUTPUT
+          else
+            echo "run_id=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download artifact from found run
+        if: steps.find_run.outputs.run_id != ''
+        run: |
+          echo "Downloading artifact from run ${{ steps.find_run.outputs.run_id }}"
+          gh run download ${{ steps.find_run.outputs.run_id }} --repo ${{ github.repository }} --name app-jar --dir ./downloaded_artifact || true
+          ls -la downloaded_artifact || true
+
+      - name: Show deploy info
+        run: |
+          echo "Deploying to environment: ${{ github.event.inputs.environment }}"
+          echo "List working dir:"
+          ls -la
+          echo "List downloaded_artifact:"
+          ls -la downloaded_artifact || true
+
