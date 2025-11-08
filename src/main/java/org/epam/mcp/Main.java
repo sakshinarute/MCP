@@ -10,6 +10,7 @@ public class Main {
         System.out.println("CI/CD work flow check by Sakshi");
         System.out.println("Hello MCP");
         System.out.println("Intentional build fixed");
+        System.out.println("Build checking intentional");
 
     }
 }
