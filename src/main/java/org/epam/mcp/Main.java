@@ -9,7 +9,7 @@ public class Main {
         System.out.println("Hello from MCP integrated workflow checking 2 time!");
         System.out.println("CI/CD work flow check by Sakshi");
         System.out.println("Hello MCP");
-        System.out.println(testing with wrong input);
+        System.out.println("Intentional build fixed");
 
     }
 }
